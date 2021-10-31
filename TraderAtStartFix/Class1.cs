@@ -15,21 +15,19 @@ namespace TraderAtStartFix
 {
 	
 
-	public class ConfigHandler : BaseUnityPlugin
-    {
+	[BepInPlugin(PluginGuid, PluginName, PluginVersion)]
+	public class Plugin : BaseUnityPlugin
+	{
 		public int getWolf()
-        {
+		{
 			return Config.Bind("TraderAtStart", "WolfChance", 3, new BepInEx.Configuration.ConfigDescription("")).Value; Config.Bind("TraderAtStart", "", 3, new BepInEx.Configuration.ConfigDescription(""));
 		}
 		public int getGolden()
 		{
 			return Config.Bind("TraderAtStart", "GoldenChance", 10, new BepInEx.Configuration.ConfigDescription("")).Value; Config.Bind("TraderAtStart", "", 3, new BepInEx.Configuration.ConfigDescription(""));
 		}
-	}
-	[BepInPlugin(PluginGuid, PluginName, PluginVersion)]
-	public class Plugin : BaseUnityPlugin
-	{
-		private const string PluginGuid = "bobthenerd.inscryption.traderstart";
+
+		private const string PluginGuid = "porta.inscryption.traderstart";
 		private const string PluginName = "TraderAtStart";
 		private const string PluginVersion = "1.0.0";
 
@@ -50,7 +48,7 @@ namespace TraderAtStartFix
 			[HarmonyPrefix]
 			public static bool Prefix(ref DeckInfo __instance)
             {
-				ConfigHandler c = new ConfigHandler();
+				Plugin c = new Plugin();
 
 				__instance.AddCard(CardLoader.GetCardByName("PeltHare"));
 				__instance.AddCard(CardLoader.GetCardByName("PeltHare"));
