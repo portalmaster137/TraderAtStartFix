@@ -10,8 +10,22 @@ using UnityEngine;
 using DiskCardGame;
 using HarmonyLib;
 
+
 namespace TraderAtStartFix
 {
+	
+
+	public class ConfigHandler : BaseUnityPlugin
+    {
+		public int getWolf()
+        {
+			return Config.Bind("TraderAtStart", "WolfChance", 3, new BepInEx.Configuration.ConfigDescription("")).Value; Config.Bind("TraderAtStart", "", 3, new BepInEx.Configuration.ConfigDescription(""));
+		}
+		public int getGolden()
+		{
+			return Config.Bind("TraderAtStart", "GoldenChance", 10, new BepInEx.Configuration.ConfigDescription("")).Value; Config.Bind("TraderAtStart", "", 3, new BepInEx.Configuration.ConfigDescription(""));
+		}
+	}
 	[BepInPlugin(PluginGuid, PluginName, PluginVersion)]
 	public class Plugin : BaseUnityPlugin
 	{
@@ -25,7 +39,7 @@ namespace TraderAtStartFix
 		{
 			Logger.LogInfo($"Loaded {PluginName}!");
 			Plugin.Log = base.Logger;
-
+			
 			Harmony harmony = new Harmony(PluginGuid);
 			harmony.PatchAll();
 		}
@@ -36,15 +50,17 @@ namespace TraderAtStartFix
 			[HarmonyPrefix]
 			public static bool Prefix(ref DeckInfo __instance)
             {
+				ConfigHandler c = new ConfigHandler();
+
 				__instance.AddCard(CardLoader.GetCardByName("PeltHare"));
 				__instance.AddCard(CardLoader.GetCardByName("PeltHare"));
 				__instance.AddCard(CardLoader.GetCardByName("PeltHare"));
 				__instance.AddCard(CardLoader.GetCardByName("PeltHare"));
-				if (SeededRandom.Range(1,3, SaveManager.SaveFile.GetCurrentRandomSeed()) == 1)
+				if (SeededRandom.Range(1, c.getWolf(), SaveManager.SaveFile.GetCurrentRandomSeed()) == 1)
                 {
 					__instance.AddCard(CardLoader.GetCardByName("PeltWolf"));
 				}
-				if (SeededRandom.Range(1, 10, SaveManager.SaveFile.GetCurrentRandomSeed()) == 1)
+				if (SeededRandom.Range(1, c.getGolden(), SaveManager.SaveFile.GetCurrentRandomSeed()) == 1)
 				{
 					__instance.AddCard(CardLoader.GetCardByName("PeltGolden"));
 				}
