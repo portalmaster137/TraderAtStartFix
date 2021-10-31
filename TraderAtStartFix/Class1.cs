@@ -18,13 +18,22 @@ namespace TraderAtStartFix
 	[BepInPlugin(PluginGuid, PluginName, PluginVersion)]
 	public class Plugin : BaseUnityPlugin
 	{
+		public bool getSuperSecretConfig()
+        {
+		 	return Config.Bind("TraderAtStart", "SuperSecretOption", true, new BepInEx.Configuration.ConfigDescription("dont use this unless you wanna have a bad time")).Value;
+		}
+
+		public int getHare()
+        {
+			return Config.Bind("TraderAtStart", "RabbitCount", 4, new BepInEx.Configuration.ConfigDescription("")).Value;
+        }
 		public int getWolf()
 		{
-			return Config.Bind("TraderAtStart", "WolfChance", 3, new BepInEx.Configuration.ConfigDescription("")).Value; Config.Bind("TraderAtStart", "", 3, new BepInEx.Configuration.ConfigDescription(""));
+			return Config.Bind("TraderAtStart", "WolfChance", 3, new BepInEx.Configuration.ConfigDescription("")).Value;
 		}
 		public int getGolden()
 		{
-			return Config.Bind("TraderAtStart", "GoldenChance", 10, new BepInEx.Configuration.ConfigDescription("")).Value; Config.Bind("TraderAtStart", "", 3, new BepInEx.Configuration.ConfigDescription(""));
+			return Config.Bind("TraderAtStart", "GoldenChance", 10, new BepInEx.Configuration.ConfigDescription("")).Value;
 		}
 
 		private const string PluginGuid = "porta.inscryption.traderstart";
@@ -50,18 +59,30 @@ namespace TraderAtStartFix
             {
 				Plugin c = new Plugin();
 
-				__instance.AddCard(CardLoader.GetCardByName("PeltHare"));
-				__instance.AddCard(CardLoader.GetCardByName("PeltHare"));
-				__instance.AddCard(CardLoader.GetCardByName("PeltHare"));
-				__instance.AddCard(CardLoader.GetCardByName("PeltHare"));
-				if (SeededRandom.Range(1, c.getWolf(), SaveManager.SaveFile.GetCurrentRandomSeed()) == 1)
+				if (c.getSuperSecretConfig())
                 {
-					__instance.AddCard(CardLoader.GetCardByName("PeltWolf"));
+					for (int i = 0; i < c.getHare(); i++)
+					{
+						__instance.AddCard(CardLoader.GetCardByName("PeltGolden"));
+					}
+				} else
+                {
+					for (int i = 0; i < c.getHare(); i++)
+					{
+						__instance.AddCard(CardLoader.GetCardByName("PeltHare"));
+					}
+
+					if (SeededRandom.Range(1, c.getWolf(), SaveManager.SaveFile.GetCurrentRandomSeed()) == 1)
+					{
+						__instance.AddCard(CardLoader.GetCardByName("PeltWolf"));
+					}
+					if (SeededRandom.Range(1, c.getGolden(), SaveManager.SaveFile.GetCurrentRandomSeed()) == 1)
+					{
+						__instance.AddCard(CardLoader.GetCardByName("PeltGolden"));
+					}
 				}
-				if (SeededRandom.Range(1, c.getGolden(), SaveManager.SaveFile.GetCurrentRandomSeed()) == 1)
-				{
-					__instance.AddCard(CardLoader.GetCardByName("PeltGolden"));
-				}
+
+                
 				return false;
 			}
 
@@ -70,18 +91,60 @@ namespace TraderAtStartFix
 		[HarmonyPatch(typeof(PaperGameMap), "TryInitializeMapData")]
 		public class RunState_TryInitializeMapData
         {
+			
 			public static bool Prefix(ref PaperGameMap __instance)
             {
+				Plugin c = new Plugin();
 				if (RunState.Run.map == null)
 				{
-					PredefinedNodes nodes = ScriptableObject.CreateInstance<PredefinedNodes>();
-					PredefinedScenery scenery = ScriptableObject.CreateInstance<PredefinedScenery>();
-					var node1 = new NodeData();
-					var node2 = new TradePeltsNodeData();
-					nodes.nodeRows.Add(new List<NodeData>() { node1 });
-					nodes.nodeRows.Add(new List<NodeData>() { node2 });
-					RunState.Run.map = MapGenerator.GenerateMap(RunState.CurrentMapRegion, 3, 13, nodes, scenery);
-					RunState.Run.currentNodeId = SaveManager.SaveFile.currentRun.map.RootNode.id;
+					if (c.getSuperSecretConfig())
+                    {
+						PredefinedNodes nodes = ScriptableObject.CreateInstance<PredefinedNodes>();
+						PredefinedScenery scenery = ScriptableObject.CreateInstance<PredefinedScenery>();
+						var node1 = new NodeData();
+						var node2 = new TradePeltsNodeData();
+						var node3 = new CardChoicesNodeData();
+						var node4 = new CardBattleNodeData();
+						var node5 = new CardChoicesNodeData();
+						node5.choicesType = CardChoicesType.Random;
+						var node6 = new CardChoicesNodeData();
+						node6.choicesType = CardChoicesType.Random;
+						var node7 = new CardChoicesNodeData();
+						node7.choicesType = CardChoicesType.Random;
+						var node8a = new CardChoicesNodeData();
+						node8a.choicesType = CardChoicesType.Random;
+						var node8b = new TradePeltsNodeData();
+						var boss1 = new BossBattleNodeData();
+						boss1.bossType = Opponent.Type.ProspectorBoss;
+						var boss2 = new BossBattleNodeData();
+						boss2.bossType = Opponent.Type.AnglerBoss;
+						var boss3 = new BossBattleNodeData();
+						boss3.bossType = Opponent.Type.TrapperTraderBoss;
+						Plugin.Log.LogInfo("Loading Rows");
+						nodes.nodeRows.Add(new List<NodeData>() { node1 });
+						nodes.nodeRows.Add(new List<NodeData>() { node2 });
+						nodes.nodeRows.Add(new List<NodeData>() { node3 });
+						nodes.nodeRows.Add(new List<NodeData>() { node4 });
+						nodes.nodeRows.Add(new List<NodeData>() { node5 });
+						nodes.nodeRows.Add(new List<NodeData>() { node6 });
+						nodes.nodeRows.Add(new List<NodeData>() { node7 });
+						nodes.nodeRows.Add(new List<NodeData>() { node8a, node8b });
+						nodes.nodeRows.Add(new List<NodeData>() { boss1 });
+						nodes.nodeRows.Add(new List<NodeData>() { boss2 });
+						nodes.nodeRows.Add(new List<NodeData>() { boss3 });
+						RunState.Run.map = MapGenerator.GenerateMap(RunState.CurrentMapRegion, 3, 13, nodes, scenery);
+						RunState.Run.currentNodeId = SaveManager.SaveFile.currentRun.map.RootNode.id;
+					} else
+                    {
+						PredefinedNodes nodes = ScriptableObject.CreateInstance<PredefinedNodes>();
+						PredefinedScenery scenery = ScriptableObject.CreateInstance<PredefinedScenery>();
+						var node1 = new NodeData();
+						var node2 = new TradePeltsNodeData();
+						nodes.nodeRows.Add(new List<NodeData>() { node1 });
+						nodes.nodeRows.Add(new List<NodeData>() { node2 });
+						RunState.Run.map = MapGenerator.GenerateMap(RunState.CurrentMapRegion, 3, 13, nodes, scenery);
+						RunState.Run.currentNodeId = SaveManager.SaveFile.currentRun.map.RootNode.id;
+					}
 
 				}
 				return false;
