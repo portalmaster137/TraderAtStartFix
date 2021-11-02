@@ -20,7 +20,7 @@ namespace TraderAtStartFix
 	{
 		public bool getSuperSecretConfig()
         {
-		 	return Config.Bind("TraderAtStart", "SuperSecretOption", true, new BepInEx.Configuration.ConfigDescription("dont use this unless you wanna have a bad time")).Value;
+		 	return Config.Bind("TraderAtStart", "SuperSecretOption", false, new BepInEx.Configuration.ConfigDescription("dont use this unless you wanna have a bad time")).Value;
 		}
 
 		public int getHare()
