@@ -13,14 +13,19 @@ using HarmonyLib;
 
 namespace TraderAtStartFix
 {
-	
 
-	[BepInPlugin(PluginGuid, PluginName, PluginVersion)]
+    [BepInPlugin(PluginGuid, PluginName, PluginVersion)]
 	public class Plugin : BaseUnityPlugin
 	{
+
+
+
+
+
+
 		public bool getSuperSecretConfig()
         {
-		 	return Config.Bind("TraderAtStart", "SuperSecretOption", true, new BepInEx.Configuration.ConfigDescription("dont use this unless you wanna have a bad time")).Value;
+		 	return Config.Bind("TraderAtStart", "SuperSecretOption", false, new BepInEx.Configuration.ConfigDescription("dont use this unless you wanna have a bad time")).Value;
 		}
 
 		public int getHare()
@@ -150,5 +155,7 @@ namespace TraderAtStartFix
 				return false;
 			}
         }
+
+
 	}
 }

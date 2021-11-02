@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/TraderAtStartFix/Compiled/README.md
+/TraderAtStartFix/Compiled/manifest.json
+/TraderAtStartFix/Compiled/icon.png
+/TraderAtStartFix/Compiled/DraftingMod.zip
