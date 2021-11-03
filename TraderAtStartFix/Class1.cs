@@ -14,11 +14,12 @@ using HarmonyLib;
 namespace TraderAtStartFix
 {
 
+	
+
     [BepInPlugin(PluginGuid, PluginName, PluginVersion)]
+	[BepInIncompatibility("porta.inscryption.constantdeck")]
 	public class Plugin : BaseUnityPlugin
 	{
-
-
 
 
 
@@ -49,9 +50,10 @@ namespace TraderAtStartFix
 
 		private void Awake()
 		{
-			Logger.LogInfo($"Loaded {PluginName}!");
+			Logger.LogInfo($"Loading {PluginName}!");
 			Plugin.Log = base.Logger;
 			
+
 			Harmony harmony = new Harmony(PluginGuid);
 			harmony.PatchAll();
 		}
