@@ -153,6 +153,7 @@ namespace TraderAtStartFix
 						//RunState.Run.map = MapGenerator.GenerateMap(RunState.CurrentMapRegion, 3, 13, nodes, scenery);
 						__instance.PredefinedNodes = nodes;
 						//RunState.Run.currentNodeId = SaveManager.SaveFile.currentRun.map.RootNode.id;
+						Plugin.Log.LogInfo("You have been EGG'd");
 					}
 
 				}
