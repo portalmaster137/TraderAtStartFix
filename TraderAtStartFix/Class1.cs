@@ -44,7 +44,7 @@ namespace TraderAtStartFix
 
 		private const string PluginGuid = "porta.inscryption.traderstart";
 		private const string PluginName = "TraderAtStart";
-		private const string PluginVersion = "1.0.0";
+		private const string PluginVersion = "1.1.0";
 
 		internal static ManualLogSource Log;
 
@@ -99,7 +99,7 @@ namespace TraderAtStartFix
 		public class RunState_TryInitializeMapData
         {
 			
-			public static bool Prefix(ref PaperGameMap __instance)
+			public static void Prefix(ref PaperGameMap __instance)
             {
 				Plugin c = new Plugin();
 				if (RunState.Run.map == null)
@@ -139,8 +139,9 @@ namespace TraderAtStartFix
 						nodes.nodeRows.Add(new List<NodeData>() { boss1 });
 						nodes.nodeRows.Add(new List<NodeData>() { boss2 });
 						nodes.nodeRows.Add(new List<NodeData>() { boss3 });
-						RunState.Run.map = MapGenerator.GenerateMap(RunState.CurrentMapRegion, 3, 13, nodes, scenery);
-						RunState.Run.currentNodeId = SaveManager.SaveFile.currentRun.map.RootNode.id;
+						__instance.PredefinedNodes = nodes;
+						//RunState.Run.map = MapGenerator.GenerateMap(RunState.CurrentMapRegion, 3, 13, nodes, scenery);
+						//RunState.Run.currentNodeId = SaveManager.SaveFile.currentRun.map.RootNode.id;
 					} else
                     {
 						PredefinedNodes nodes = ScriptableObject.CreateInstance<PredefinedNodes>();
@@ -149,12 +150,12 @@ namespace TraderAtStartFix
 						var node2 = new TradePeltsNodeData();
 						nodes.nodeRows.Add(new List<NodeData>() { node1 });
 						nodes.nodeRows.Add(new List<NodeData>() { node2 });
-						RunState.Run.map = MapGenerator.GenerateMap(RunState.CurrentMapRegion, 3, 13, nodes, scenery);
-						RunState.Run.currentNodeId = SaveManager.SaveFile.currentRun.map.RootNode.id;
+						//RunState.Run.map = MapGenerator.GenerateMap(RunState.CurrentMapRegion, 3, 13, nodes, scenery);
+						__instance.PredefinedNodes = nodes;
+						//RunState.Run.currentNodeId = SaveManager.SaveFile.currentRun.map.RootNode.id;
 					}
 
 				}
-				return false;
 			}
         }
 
