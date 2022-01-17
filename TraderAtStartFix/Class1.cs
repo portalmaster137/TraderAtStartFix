@@ -21,55 +21,91 @@ namespace TraderAtStartFix
     {
 
 
-        public bool getSuperSecretConfig()
+        public bool GetSuperSecretConfig()
         {
             return Config.Bind("TraderAtStart", "SuperSecretOption", false, new BepInEx.Configuration.ConfigDescription("dont use this unless you wanna have a bad time")).Value;
         }
 
-        public int getHare()
+        public bool GetUsePercents()
+        {
+            return Config.Bind("TraderAtStart", "UsePercents", false, new BepInEx.Configuration.ConfigDescription("use percents instead of the default chances")).Value;
+        }
+
+        public int GetHareCount()
         {
             return Config.Bind("TraderAtStart", "RabbitCount", 4, new BepInEx.Configuration.ConfigDescription("how many pelts are guaranteed")).Value;
         }
 
-        public int getHareOptional()
+        public int GetHareOptional()
         {
             return Config.Bind("TraderAtStart", "RabbitCountOptional", 0, new BepInEx.Configuration.ConfigDescription("max number of additional pelts given")).Value;
         }
 
-        public int getHareChance()
+        public int GetHareChance()
         {
             return Config.Bind("TraderAtStart", "RabbitChance", 2, new BepInEx.Configuration.ConfigDescription("chance to get 1 additonal pelt (0 for never)")).Value;
         }
 
-        public int getWolf()
+        public double GetHarePercent()
+        {
+            return Config.Bind("TraderAtStart", "RabbitPercentChance", 0.0, new BepInEx.Configuration.ConfigDescription("chance to get an extra pelt as a percent out of 100 (0 for never)")).Value;
+        }
+
+        public int GetWolfCount()
         {
             return Config.Bind("TraderAtStart", "WolfCount", 0, new BepInEx.Configuration.ConfigDescription("how many pelts are guaranteed")).Value;
         }
 
-        public int getWolfOptional()
+        public int GetWolfOptional()
         {
             return Config.Bind("TraderAtStart", "WolfCountOptional", 1, new BepInEx.Configuration.ConfigDescription("max number of additional pelts given")).Value;
         }
 
-        public int getWolfChance()
+        public int GetWolfChance()
         {
             return Config.Bind("TraderAtStart", "WolfChance", 3, new BepInEx.Configuration.ConfigDescription("chance to get 1 additonal pelt (0 for never)")).Value;
         }
 
-        public int getGolden()
+        public double GetWolfPercent()
+        {
+            return Config.Bind("TraderAtStart", "WolfPercentChance", 0.0, new BepInEx.Configuration.ConfigDescription("chance to get an extra pelt as a percent out of 100 (0 for never)")).Value;
+        }
+
+        public int GetGoldenCount()
         {
             return Config.Bind("TraderAtStart", "GoldenCount", 0, new BepInEx.Configuration.ConfigDescription("how many pelts are guaranteed")).Value;
         }
 
-        public int getGoldenOptional()
+        public int GetGoldenOptional()
         {
             return Config.Bind("TraderAtStart", "GoldenCountOptional", 1, new BepInEx.Configuration.ConfigDescription("max number of additional pelts given")).Value;
         }
 
-        public int getGoldenChance()
+        public int GetGoldenChance()
         {
             return Config.Bind("TraderAtStart", "GoldenChance", 10, new BepInEx.Configuration.ConfigDescription("chance to get 1 additonal pelt (0 for never)")).Value;
         }
+
+        public double GetGoldenPercent()
+        {
+            return Config.Bind("TraderAtStart", "GoldenPercentChance", 0.0, new BepInEx.Configuration.ConfigDescription("chance to get an extra pelt as a percent out of 100 (0 for never)")).Value;
+        }
+
+        public double GetAbsoluteChanceHare()
+        {
+            return GetUsePercents() ? GetHarePercent() / 100 : 1.0 / GetHareChance();
+        }
+
+        public double GetAbsoluteChanceWolf()
+        {
+            return GetUsePercents() ? GetWolfPercent() / 100 : 1.0 / GetWolfChance();
+        }
+
+        public double GetAbsoluteChanceGolden()
+        {
+            return GetUsePercents() ? GetGoldenPercent() / 100 : 1.0 / GetGoldenChance();
+        }
+
 
         private const string PluginGuid = "porta.inscryption.traderstart";
         private const string PluginName = "TraderAtStart";
@@ -83,16 +119,20 @@ namespace TraderAtStartFix
             Plugin.Log = Logger;
 
             // should generate the config as soon as the game boots
-            getSuperSecretConfig();
-            getHare();
-            getHareChance();
-            getHareOptional();
-            getWolf();
-            getWolfChance();
-            getWolfOptional();
-            getGolden();
-            getGoldenChance();
-            getGoldenOptional();
+            GetSuperSecretConfig();
+            GetUsePercents();
+            GetHareCount();
+            GetHareChance();
+            GetHareOptional();
+            GetHarePercent();
+            GetWolfCount();
+            GetWolfChance();
+            GetWolfOptional();
+            GetWolfPercent();
+            GetGoldenCount();
+            GetGoldenChance();
+            GetGoldenOptional();
+            GetGoldenPercent();
 
             Harmony harmony = new Harmony(PluginGuid);
             harmony.PatchAll();
@@ -101,30 +141,31 @@ namespace TraderAtStartFix
         [HarmonyPatch(typeof(DeckInfo), "InitializeAsPlayerDeck")]
         public class TraderStartPatch : DeckInfo
         {
+            private static readonly System.Random r = new System.Random();
+
             [HarmonyPrefix]
             public static bool Prefix(ref DeckInfo __instance)
             {
-                Log.LogInfo("Prefix init");
                 Plugin c = new Plugin();
 
-                if (c.getSuperSecretConfig())
+                if (c.GetSuperSecretConfig())
                 {
-                    for (int i = 0; i < c.getHare(); i++)
+                    for (int i = 0; i < c.GetHareCount(); i++)
                     {
                         __instance.AddCard(CardLoader.GetCardByName("PeltGolden"));
                     }
                 }
                 else
                 {
-                    GenerateDeck(ref __instance, "PeltHare", c.getHare(), c.getHareOptional(), c.getHareChance());
-                    GenerateDeck(ref __instance, "PeltWolf", c.getWolf(), c.getWolfOptional(), c.getWolfChance());
-                    GenerateDeck(ref __instance, "PeltGolden", c.getGolden(), c.getGoldenOptional(), c.getGoldenChance());
+                    PopulatePelts(ref __instance, "PeltHare", c.GetHareCount(), c.GetHareOptional(), c.GetAbsoluteChanceHare());
+                    PopulatePelts(ref __instance, "PeltWolf", c.GetWolfCount(), c.GetWolfOptional(), c.GetAbsoluteChanceWolf());
+                    PopulatePelts(ref __instance, "PeltGolden", c.GetGoldenCount(), c.GetGoldenOptional(), c.GetAbsoluteChanceGolden());
                 }
 
                 return false;
             }
 
-            private static void GenerateDeck(ref DeckInfo __instance, string peltName, int count, int countOptional, int chance)
+            private static void PopulatePelts(ref DeckInfo __instance, string peltName, int count, int countOptional, double chance)
             {
                 for (int i = 0; i < count; i++)
                 {
@@ -134,11 +175,7 @@ namespace TraderAtStartFix
                 {
                     for (int j = 0; j < countOptional; j++)
                     {
-                        System.Random r = new System.Random();
-
-                        int randInt = SeededRandom.Range(1, chance, r.GetHashCode());
-
-                        if (randInt == 1)
+                        if (r.NextDouble() < chance)
                         {
                             __instance.AddCard(CardLoader.GetCardByName(peltName));
                         }
@@ -156,7 +193,7 @@ namespace TraderAtStartFix
                 Plugin c = new Plugin();
                 if (RunState.Run.map == null)
                 {
-                    if (c.getSuperSecretConfig())
+                    if (c.GetSuperSecretConfig())
                     {
                         PredefinedNodes nodes = ScriptableObject.CreateInstance<PredefinedNodes>();
                         PredefinedScenery scenery = ScriptableObject.CreateInstance<PredefinedScenery>();
