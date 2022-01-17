@@ -93,17 +93,44 @@ namespace TraderAtStartFix
 
         public double GetAbsoluteChanceHare()
         {
-            return GetUsePercents() ? GetHarePercent() / 100 : 1.0 / GetHareChance();
+            if (GetUsePercents())
+            {
+                return GetHarePercent() / 100;
+            }
+
+            if (GetHareChance() > 0)
+            {
+                return 1.0 / GetHareChance();
+            }
+            return 0.0;
         }
 
         public double GetAbsoluteChanceWolf()
         {
-            return GetUsePercents() ? GetWolfPercent() / 100 : 1.0 / GetWolfChance();
+            if (GetUsePercents())
+            {
+                return GetWolfPercent() / 100;
+            }
+
+            if (GetWolfChance() > 0)
+            {
+                return 1.0 / GetWolfChance();
+            }
+            return 0.0;
         }
 
         public double GetAbsoluteChanceGolden()
         {
-            return GetUsePercents() ? GetGoldenPercent() / 100 : 1.0 / GetGoldenChance();
+            if (GetUsePercents())
+            {
+                return GetGoldenPercent() / 100;
+            }
+
+            if (GetGoldenChance() > 0)
+            {
+                return 1.0 / GetGoldenChance();
+            }
+            return 0.0;
         }
 
 
@@ -171,7 +198,7 @@ namespace TraderAtStartFix
                 {
                     __instance.AddCard(CardLoader.GetCardByName(peltName));
                 }
-                if (chance > 0)
+                if (chance > 0.0)
                 {
                     for (int j = 0; j < countOptional; j++)
                     {
